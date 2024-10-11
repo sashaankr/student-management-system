@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="mb-4">Dashboard</h2>
+
+<!-- Add Student Form -->
+<h4>Add Student</h4>
+<form method="POST" action="{{ url_for('add_student') }}">
+    <div class="form-group">
+        <label for="name">Student Name</label>
+        <input type="text" class="form-control" id="name" name="name" placeholder="Enter student name" required>
+    </div>
+    <div class="form-group">
+        <label for="age">Age</label>
+        <input type="number" class="form-control" id="age" name="age" placeholder="Enter age" required>
+    </div>
+    <div class="form-group">
+        <label for="course">Course</label>
+        <input type="text" class="form-control" id="course" name="course" placeholder="Enter course" required>
+    </div>
+    <button type="submit" class="btn btn-success">Add Student</button>
+</form>
+
+<!-- List of Students -->
+<h4 class="mt-5">Students List</h4>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Course</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for student in students %}
+        <tr>
+            <td>{{ student.name }}</td>
+            <td>{{ student.age }}</td>
+            <td>{{ student.course }}</td>
+            <td>
+                <a href="{{ url_for('delete_student', id=student.id) }}" class="btn btn-danger">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
