@@ -1,6 +1,6 @@
 from flask import Flask, render_template, redirect, url_for, flash, request
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
@@ -36,6 +36,7 @@ def load_user(user_id):
 def index():
     return redirect(url_for('login'))
 
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -49,6 +50,7 @@ def login():
         else:
             flash('Invalid username or password', 'danger')
     return render_template('login.html')
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -69,17 +71,20 @@ def register():
 
     return render_template('register.html')
 
+
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
     return redirect(url_for('login'))
 
+
 @app.route('/dashboard')
 @login_required
 def dashboard():
     students = Student.query.all()
     return render_template('dashboard.html', students=students)
+
 
 @app.route('/add_student', methods=['POST'])
 @login_required
@@ -92,6 +97,28 @@ def add_student():
     db.session.commit()
     return redirect(url_for('dashboard'))
 
+
+@app.route('/edit/<int:id>', methods=['GET', 'POST'])
+@login_required
+def edit_student(id):
+    student = Student.query.get_or_404(id)
+
+    if request.method == 'POST':
+        student.name = request.form['name']
+        student.age = request.form['age']
+        student.course = request.form['course']
+
+        try:
+            db.session.commit()
+            flash(f"Student '{student.name}' has been successfully updated!", 'success')
+            return redirect(url_for('dashboard'))
+        except:
+            db.session.rollback()
+            flash('An error occurred while updating the student.', 'danger')
+
+    return render_template('edit_student.html', student=student)
+
+
 @app.route('/delete_student/<int:id>')
 @login_required
 def delete_student(id):
@@ -99,6 +126,7 @@ def delete_student(id):
     db.session.delete(student)
     db.session.commit()
     return redirect(url_for('dashboard'))
+
 
 if __name__ == "__main__":
     with app.app_context():
